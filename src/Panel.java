@@ -35,8 +35,6 @@ public class Panel extends JPanel implements Serializable {
         ButtonCreater.setButtonVisible();
     }
 
-
-
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
