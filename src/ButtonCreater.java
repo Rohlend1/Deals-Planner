@@ -1,3 +1,5 @@
+
+
 import javax.swing.*;
 import java.awt.font.TextAttribute;
 import java.io.FileInputStream;
@@ -70,6 +72,7 @@ public class ButtonCreater extends Panel{
     private static void createImpl(){                               // Создаем реализацию кнопок
         jButtonClear.addActionListener(e -> {
             if(id == 0){
+                saveGoals.clear();
                 Goals.getGoals().clear();
             }
             else if (id == 1){
@@ -98,7 +101,13 @@ public class ButtonCreater extends Panel{
                     int size = goalsStream.readInt();
                     HashMap<Integer, AttributedString> goals= new HashMap<>();
                     for(int i = 0; i < size; i++){
-                        AttributedString atrs = new AttributedString((String)goalsStream.readObject());
+                        AttributedString atrs;
+                        String str = (String)goalsStream.readObject();
+                        if(str.charAt(str.length()-1) == '1'){
+                            atrs = new AttributedString(str.substring(0,str.length()-1));
+                            atrs.addAttribute(TextAttribute.STRIKETHROUGH, TextAttribute.STRIKETHROUGH_ON);
+                        }
+                        else atrs = new AttributedString(str);
                         atrs.addAttribute(TextAttribute.FONT, plainFont);
                         goals.put(i, atrs);
                     }
@@ -145,17 +154,20 @@ public class ButtonCreater extends Panel{
         jButtonAccept.addActionListener(e -> {
             String str = jTextField.getText();
             if(id == 0) {
-                saveGoals.add(str);
-                AttributedString atrs = new AttributedString(str);
-                atrs.addAttribute(TextAttribute.FONT, plainFont);
-                Goals.addGoal(atrs);
+                if(!(saveGoals.contains(str))) {
+                    saveGoals.add(str);
+                    AttributedString atrs = new AttributedString(str);
+                    atrs.addAttribute(TextAttribute.FONT, plainFont);
+                    Goals.addGoal(atrs);
+                }
             }
         });
         jButtonStrikeThrough.addActionListener(e -> {
             int index = Integer.parseInt(jTextField.getText())-1;
             if(!(index < 0 || index >= saveGoals.size())) {
+                saveGoals.set(index, saveGoals.get(index)+"1");
                 AttributedString str = Goals.getGoals().get(index);
-                str.addAttribute(TextAttribute.STRIKETHROUGH, TextAttribute.STRIKETHROUGH_ON, 0, StringConverter.atrsToString(str).length());
+                str.addAttribute(TextAttribute.STRIKETHROUGH, TextAttribute.STRIKETHROUGH_ON);
             }
         });
 

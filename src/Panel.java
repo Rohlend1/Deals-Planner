@@ -85,7 +85,6 @@ public class Panel extends JPanel implements Serializable {
 
         int x = 24, y = 70;
         if (goals.size() != 0) {
-
             for (Map.Entry<Integer, AttributedString> pair : goals.entrySet()) {
                 AttributedString s = new AttributedString((pair.getKey() + 1) + ". ");
                 s.addAttribute(TextAttribute.FONT, plainFont);
