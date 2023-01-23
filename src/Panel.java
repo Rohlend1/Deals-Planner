@@ -16,7 +16,8 @@ public class Panel extends JPanel implements Serializable {
     private static final int HEIGHT = 1000;
     static final Font plainFont = new Font("Times New Roman", Font.PLAIN, 20);
     private static Component panel = anotherPanel();
-    public static AttributedString atrsTime = new AttributedString(Time.now());
+    public static AttributedString atrsTime;
+    public static AttributedString atrsDay;
     static int id = 0; // Идентификатор текущего окна(0 - запись целей, 1 - запись событий на число)
 
     private static final Font font = new Font("Times New Roman", Font.BOLD, 20);
@@ -24,7 +25,7 @@ public class Panel extends JPanel implements Serializable {
 
     public Panel() {
         setLayout(null);
-
+        setBackground(Color.getHSBColor(22,33,45));
         JButton[] buttons = ButtonCreater.createButtons(WIDTH, HEIGHT);
         jTextField.setBounds(WIDTH / 2 - 50, HEIGHT / 2 - 150, 100, 25);
         for (JButton button : buttons) {
@@ -38,10 +39,13 @@ public class Panel extends JPanel implements Serializable {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        atrsTime = new AttributedString(Time.now());
+        String[] arr = Time.now().split("!");
+        atrsDay = new AttributedString(arr[0]);
+        atrsTime = new AttributedString(arr[1]);
         setAttributesToStrings();
 
-        g.drawString(Panel.atrsTime.getIterator(), WIDTH - 250, 30);
+        g.drawString(Panel.atrsDay.getIterator(), WIDTH - 130,40);
+        g.drawString(Panel.atrsTime.getIterator(), WIDTH - 135, 25);
         if(id == 0) {
             AttributedString atrs = new AttributedString("<<Запись цели>>");
             atrs.addAttribute(TextAttribute.FONT, font);
@@ -74,7 +78,8 @@ public class Panel extends JPanel implements Serializable {
     }
 
     public static void setAttributesToStrings() {
-        atrsTime.addAttribute(TextAttribute.FONT, font);
+        atrsTime.addAttribute(TextAttribute.FONT, new Font("Times New Roman",Font.BOLD,24));
+        atrsDay.addAttribute(TextAttribute.FONT, new Font("Times New Roman",Font.BOLD,16));
     }
 
 

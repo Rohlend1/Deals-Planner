@@ -8,7 +8,7 @@ import java.util.*;
 
 public class Time{
     private static final DateTimeFormatter parserFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-    private static final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("EEEE, d MMM HH:mm:ss");
+    private static final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("EEE, d MMM!HH:mm:ss");
     private static final DateTimeFormatter dfe = DateTimeFormatter.ofPattern("EEEE, dd MMM yyyy");
     private static ArrayList<String> eventArr = new ArrayList<>();
 
