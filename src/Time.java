@@ -19,14 +19,14 @@ public class Time{
     public static void addToCalendar(String[] str){
         if(str.length != 2) return;
 
-
         String date = str[0];
         String event = str[1];
         LocalDate dateTime = LocalDate.parse(date,parserFormatter);
-        eventArr.add(event);
-        LocalDate eventDate = LocalDate.of(dateTime.getYear(),
-                dateTime.getMonth(), dateTime.getDayOfMonth());
-        eventArr.add((dfe.format(eventDate) + " - " + event));
+
+        if(!eventArr.contains(event) || !(dfe.format(dateTime).equals(eventArr.get(eventArr.indexOf(event)+1).split(" - ")[0].strip()))) {
+            eventArr.add(event);
+            eventArr.add((dfe.format(dateTime) + " - " + event));
+        }
 
     }
     public static String now(){

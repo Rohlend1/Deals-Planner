@@ -11,6 +11,7 @@ public class Panel extends JPanel implements Serializable {
 
     private static final JFrame f = new JFrame();
     static ArrayList<String> saveGoals = new ArrayList<>(); // для сохранения целей и индексов, т.к. atributtedstring несериализуем
+
     public static final JTextField jTextField = new JTextField(10);
     private static final int WIDTH = 1000;
     private static final int HEIGHT = 1000;
@@ -68,7 +69,17 @@ public class Panel extends JPanel implements Serializable {
         int x = 24, y = 70;
         if(events.size() != 0){
             for (String str : events) {
-                AttributedString atrs = new AttributedString(str);
+                AttributedString atrs;
+                if(str.charAt(str.length()-1) == '\u0BF5')
+                {
+                    atrs = new AttributedString(String.format("%d. %s", (events.indexOf(str)+1)/2,str.substring(0,str.length()-1)));
+                    atrs.addAttribute(TextAttribute.STRIKETHROUGH, TextAttribute.STRIKETHROUGH_ON);
+                }
+                else if(events.indexOf(str)%2 != 0 && events.indexOf(str) != 0)
+                {
+                    atrs = new AttributedString(String.format("%d. %s", (events.indexOf(str)+1)/2, str));
+                }
+                else atrs = new AttributedString(str);
                 atrs.addAttribute(TextAttribute.FONT, plainFont);
                 g.drawString(atrs.getIterator(), x, y);
                 y += 20;

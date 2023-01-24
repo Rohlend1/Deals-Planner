@@ -2,6 +2,7 @@
 
 import javax.swing.*;
 import java.awt.font.TextAttribute;
+
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
@@ -17,19 +18,19 @@ public class ButtonCreater extends Panel{
     private static JButton jButtonLoad;
     private static JButton jButtonAccept;
     private static JButton jButtonStrikeThrough;
-    private static JButton jButtonAddEvent;
+//    private static JButton jButtonAddEvent;
     private static JButton jButtonLeftArrow;
     private static JButton jButtonRightArrow;
     private static JButton jButtonClear;
 
 
     static JButton[] createButtons(int width, int height){ // Создаем сами кнопки
-        JButton[] res = new JButton[8];
+        JButton[] res = new JButton[7];
         jButtonSave = new JButton("Сохранить");
         jButtonLoad = new JButton("Загрузить");
         jButtonAccept = new JButton("Подтвердить");
         jButtonStrikeThrough = new JButton("Вычеркнуть");
-        jButtonAddEvent = new JButton("Добавить событие");
+
         jButtonLeftArrow = new JButton("←");
         jButtonRightArrow = new JButton("→");
         jButtonClear = new JButton("Очистить");
@@ -40,32 +41,31 @@ public class ButtonCreater extends Panel{
         jButtonLoad.setBounds(width/2 + 10,height/2 - 70,100,25);
         jButtonAccept.setBounds(width/2 - 100,height/2 - 105,100,25);
         jButtonStrikeThrough.setBounds(width/2 + 10,height/2 - 105,100,25);
-        jButtonAddEvent.setBounds(width/2 + 10,height/2 - 105,100,25);
+//        jButtonAddEvent.setBounds(width/2 + 10,height/2 - 105,100,25);
         createImpl();
 
-        res[0] = jButtonAddEvent;
         res[1] = jButtonLoad;
         res[2] = jButtonSave;
         res[3] = jButtonStrikeThrough;
         res[4] = jButtonAccept;
         res[5] = jButtonRightArrow;
         res[6] = jButtonLeftArrow;
-        res[7] = jButtonClear;
+        res[0] = jButtonClear;
         return res;
     }
 
     public static void setButtonVisible(){
-        if(id == 0){
+//        if(id == 0){
             jButtonStrikeThrough.setVisible(true);
-            jButtonAddEvent.setVisible(false);
-        }
-        else if(id == 1){
-            jButtonStrikeThrough.setVisible(false);
-            jButtonAddEvent.setVisible(true);
-        }
-        else{
-            System.out.println("Ошибка идентификатора");
-        }
+
+//        }
+//        else if(id == 1){
+//            jButtonStrikeThrough.setVisible(false);
+//
+//        }
+//        else{
+//            System.out.println("Ошибка идентификатора");
+//        }
 
     }
 
@@ -103,7 +103,7 @@ public class ButtonCreater extends Panel{
                     for(int i = 0; i < size; i++){
                         AttributedString atrs;
                         String str = (String)goalsStream.readObject();
-                        if(str.charAt(str.length()-1) == '1'){
+                        if(str.charAt(str.length()-1) == '\u0BF5'){
                             atrs = new AttributedString(str.substring(0,str.length()-1));
                             atrs.addAttribute(TextAttribute.STRIKETHROUGH, TextAttribute.STRIKETHROUGH_ON);
                         }
@@ -161,19 +161,34 @@ public class ButtonCreater extends Panel{
                     Goals.addGoal(atrs);
                 }
             }
+            else if(id == 1){
+                Time.addToCalendar(str.split(" "));
+
+
+            }
         });
         jButtonStrikeThrough.addActionListener(e -> {
-            int index = Integer.parseInt(jTextField.getText())-1;
-            if(!(index < 0 || index >= saveGoals.size())) {
-                saveGoals.set(index, saveGoals.get(index)+"1");
-                AttributedString str = Goals.getGoals().get(index);
-                str.addAttribute(TextAttribute.STRIKETHROUGH, TextAttribute.STRIKETHROUGH_ON);
+            if(id == 0){
+                int index = Integer.parseInt(jTextField.getText()) - 1;
+                if (!(index < 0 || index >= saveGoals.size() || saveGoals.get(index).charAt(saveGoals.get(index).length()-1) == '\u0BF5')) {
+                    saveGoals.set(index, saveGoals.get(index) + '\u0BF5');
+                    AttributedString str = Goals.getGoals().get(index);
+                    str.addAttribute(TextAttribute.STRIKETHROUGH, TextAttribute.STRIKETHROUGH_ON);
+                }
+            }
+            if(id == 1){
+                int index = Integer.parseInt(jTextField.getText());
+                index = index*2-1;
+
+                ArrayList<String> tempEvents = Time.getEvent();
+                if (!(index < 0
+                        || index >= Time.getEvent().size()
+                        || tempEvents.get(index).charAt(tempEvents.get(index).length()-1) == '\u0BF5'))
+                {
+                    tempEvents.set(index, tempEvents.get(index)+'\u0BF5');
+                }
             }
         });
 
-        jButtonAddEvent.addActionListener(e -> {
-            String str = jTextField.getText();
-            Time.addToCalendar(str.split(" "));
-        });
     }
 }
