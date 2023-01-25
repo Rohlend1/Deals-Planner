@@ -1,15 +1,16 @@
 
 
+import strings.EventString;
+import strings.GoalString;
 import javax.swing.*;
 import java.awt.font.TextAttribute;
-
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.text.AttributedString;
 import java.util.ArrayList;
-import java.util.HashMap;
+
 
 
 
@@ -18,7 +19,6 @@ public class ButtonCreater extends Panel{
     private static JButton jButtonLoad;
     private static JButton jButtonAccept;
     private static JButton jButtonStrikeThrough;
-//    private static JButton jButtonAddEvent;
     private static JButton jButtonLeftArrow;
     private static JButton jButtonRightArrow;
     private static JButton jButtonClear;
@@ -41,7 +41,6 @@ public class ButtonCreater extends Panel{
         jButtonLoad.setBounds(width/2 + 10,height/2 - 70,100,25);
         jButtonAccept.setBounds(width/2 - 100,height/2 - 105,100,25);
         jButtonStrikeThrough.setBounds(width/2 + 10,height/2 - 105,100,25);
-//        jButtonAddEvent.setBounds(width/2 + 10,height/2 - 105,100,25);
         createImpl();
 
         res[1] = jButtonLoad;
@@ -55,18 +54,7 @@ public class ButtonCreater extends Panel{
     }
 
     public static void setButtonVisible(){
-//        if(id == 0){
             jButtonStrikeThrough.setVisible(true);
-
-//        }
-//        else if(id == 1){
-//            jButtonStrikeThrough.setVisible(false);
-//
-//        }
-//        else{
-//            System.out.println("Ошибка идентификатора");
-//        }
-
     }
 
     private static void createImpl(){                               // Создаем реализацию кнопок
@@ -99,25 +87,18 @@ public class ButtonCreater extends Panel{
                 if(id == 0){
                     Goals.getGoals().clear();
                     int size = goalsStream.readInt();
-                    HashMap<Integer, AttributedString> goals= new HashMap<>();
+                    ArrayList<GoalString> goals= new ArrayList<>();
                     for(int i = 0; i < size; i++){
-                        AttributedString atrs;
-                        String str = (String)goalsStream.readObject();
-                        if(str.charAt(str.length()-1) == '\u0BF5'){
-                            atrs = new AttributedString(str.substring(0,str.length()-1));
-                            atrs.addAttribute(TextAttribute.STRIKETHROUGH, TextAttribute.STRIKETHROUGH_ON);
-                        }
-                        else atrs = new AttributedString(str);
-                        atrs.addAttribute(TextAttribute.FONT, plainFont);
-                        goals.put(i, atrs);
+                        GoalString str = (GoalString)goalsStream.readObject();
+                        goals.add(str);
                     }
-                    Goals.setGoalsMap(goals);
+                    Goals.setGoalsArr(goals);
                 }
                 else if(id == 1){
                     int size = eventStream.readInt();
-                    ArrayList<String> events = new ArrayList<>(size);
+                    ArrayList<EventString> events = new ArrayList<>(size);
                     for(int i = 0; i < size; i++){
-                        events.add((String) eventStream.readObject());
+                        events.add((EventString) eventStream.readObject());
                     }
                     Time.setEvent(events);
                 }
@@ -128,41 +109,48 @@ public class ButtonCreater extends Panel{
             }
         });
         jButtonSave.addActionListener(e -> {
-
-            try(ObjectOutputStream goalsSave = new ObjectOutputStream(new FileOutputStream("goals_save.bin"));
-                ObjectOutputStream eventsSave = new ObjectOutputStream(new FileOutputStream("events_save.bin")))
-            {
                 if(id == 0){
-                    goalsSave.writeInt(saveGoals.size());
-                    for(String str : saveGoals){
-                        goalsSave.writeObject(str);
+                    try(ObjectOutputStream goalsSave = new ObjectOutputStream(new FileOutputStream("goals_save.bin")))
+                    {
+                        goalsSave.writeInt(Goals.getGoals().size());
+                        for(GoalString str : Goals.getGoals())
+                        {
+                            goalsSave.writeObject(str);
+                        }
                     }
+                     catch (Exception x)
+                     {
+                         System.out.println("Ошибка записи");
+                     }
                 }
                 else if(id == 1){
-                    eventsSave.writeInt(Time.getEvent().size());
-                    for(String events : Time.getEvent()){
-                        eventsSave.writeObject(events);
+                    try(ObjectOutputStream eventsSave = new ObjectOutputStream(new FileOutputStream("events_save.bin"))) {
+                        eventsSave.writeInt(Time.getEvent().size());
+                        for (EventString events : Time.getEvent()) {
+                            eventsSave.writeObject(events);
+                        }
                     }
-
+                    catch (Exception x)
+                    {
+                        System.out.println("Ошибка записи");
+                    }
                 }
-            }
-            catch (Exception x){
-                System.out.println("Ошибка записи");
-            }
         });
 
         jButtonAccept.addActionListener(e -> {
-            String str = jTextField.getText();
+
+
             if(id == 0) {
-                if(!(saveGoals.contains(str))) {
-                    saveGoals.add(str);
-                    AttributedString atrs = new AttributedString(str);
+                GoalString str = new GoalString(jTextField.getText());
+                if(!(Goals.getGoals().contains(str))) {
+                    AttributedString atrs = new AttributedString(str.getText());
                     atrs.addAttribute(TextAttribute.FONT, plainFont);
-                    Goals.addGoal(atrs);
+                    Goals.addGoal(str);
                 }
             }
             else if(id == 1){
-                Time.addToCalendar(str.split(" "));
+                EventString str = new EventString(jTextField.getText());
+                Time.addToCalendar(str.getText().split(" "));
 
 
             }
@@ -170,22 +158,19 @@ public class ButtonCreater extends Panel{
         jButtonStrikeThrough.addActionListener(e -> {
             if(id == 0){
                 int index = Integer.parseInt(jTextField.getText()) - 1;
-                if (!(index < 0 || index >= saveGoals.size() || saveGoals.get(index).charAt(saveGoals.get(index).length()-1) == '\u0BF5')) {
-                    saveGoals.set(index, saveGoals.get(index) + '\u0BF5');
-                    AttributedString str = Goals.getGoals().get(index);
+                if (!(index < 0 || index >= Goals.getGoals().size())) {
+                    Goals.getGoals().get(index).setStrikeThrough(true);
+                    AttributedString str = new AttributedString(Goals.getGoals().get(index).getText());
                     str.addAttribute(TextAttribute.STRIKETHROUGH, TextAttribute.STRIKETHROUGH_ON);
                 }
             }
             if(id == 1){
                 int index = Integer.parseInt(jTextField.getText());
                 index = index*2-1;
-
-                ArrayList<String> tempEvents = Time.getEvent();
-                if (!(index < 0
-                        || index >= Time.getEvent().size()
-                        || tempEvents.get(index).charAt(tempEvents.get(index).length()-1) == '\u0BF5'))
+                ArrayList<EventString> tempEvents = Time.getEvent();
+                if (!(index < 0 || index >= Time.getEvent().size()))
                 {
-                    tempEvents.set(index, tempEvents.get(index)+'\u0BF5');
+                    tempEvents.get(index).setStrikeThrough(true);
                 }
             }
         });

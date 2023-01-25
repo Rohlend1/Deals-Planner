@@ -1,9 +1,13 @@
 
+
+import strings.EventString;
+import strings.GoalString;
 import java.awt.*;
 import java.awt.font.TextAttribute;
 import java.io.*;
 import java.text.AttributedString;
 import java.util.*;
+import java.util.List;
 import javax.swing.*;
 
 
@@ -65,21 +69,19 @@ public class Panel extends JPanel implements Serializable {
         repaint();
     }
 
-    private static void paintEvents(Graphics g, ArrayList<String> events){
+    private static void paintEvents(Graphics g, ArrayList<EventString> events){
         int x = 24, y = 70;
         if(events.size() != 0){
-            for (String str : events) {
-                AttributedString atrs;
-                if(str.charAt(str.length()-1) == '\u0BF5')
-                {
-                    atrs = new AttributedString(String.format("%d. %s", (events.indexOf(str)+1)/2,str.substring(0,str.length()-1)));
+            AttributedString atrs;
+            for (EventString event : events) {
+                if(events.indexOf(event) != 0 && events.indexOf(event) %2 != 0){
+                    atrs = new AttributedString(String.format("%d. %s", (events.indexOf(event) + 1) / 2, event.getText()));
+                }
+                else atrs = new AttributedString(event.getText());
+                if(event.isStrikeThrough()) {
+
                     atrs.addAttribute(TextAttribute.STRIKETHROUGH, TextAttribute.STRIKETHROUGH_ON);
                 }
-                else if(events.indexOf(str)%2 != 0 && events.indexOf(str) != 0)
-                {
-                    atrs = new AttributedString(String.format("%d. %s", (events.indexOf(str)+1)/2, str));
-                }
-                else atrs = new AttributedString(str);
                 atrs.addAttribute(TextAttribute.FONT, plainFont);
                 g.drawString(atrs.getIterator(), x, y);
                 y += 20;
@@ -95,16 +97,20 @@ public class Panel extends JPanel implements Serializable {
 
 
     // Передаем элемент
-    private static void paintGoals(Graphics g, Map<Integer, AttributedString> goals) {
+    private static void paintGoals(Graphics g, List<GoalString> goals) {
 
         int x = 24, y = 70;
         if (goals.size() != 0) {
-            for (Map.Entry<Integer, AttributedString> pair : goals.entrySet()) {
-                AttributedString s = new AttributedString((pair.getKey() + 1) + ". ");
+            for (GoalString goal : goals) {
+                String str = goals.indexOf(goal) + 1 + ". " + goal.getText();
+                int counts = (""+goals.indexOf(goal)).length()+2;
+                AttributedString s = new AttributedString(str);
                 s.addAttribute(TextAttribute.FONT, plainFont);
+                if(goal.isStrikeThrough())
+                {
+                    s.addAttribute(TextAttribute.STRIKETHROUGH, TextAttribute.STRIKETHROUGH_ON, counts, counts + goal.getText().length());
+                }
                 g.drawString(s.getIterator(), x, y);
-                if (pair.getKey() + 1 >= 10) g.drawString(pair.getValue().getIterator(), x + 30, y);
-                else g.drawString(pair.getValue().getIterator(), x + 20, y);
                 y += 20;
             }
         }

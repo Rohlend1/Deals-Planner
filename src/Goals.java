@@ -1,23 +1,30 @@
 
 
-import java.text.AttributedString;
+import strings.GoalString;
 import java.util.*;
 
 
 public class Goals {
 
-        private static HashMap<Integer, AttributedString> goalsMap = new HashMap<>();
+        private static ArrayList<GoalString> goalsArr = new ArrayList<>();
 
-        public static void addGoal(AttributedString str){
-            if(!goalsMap.containsValue(str))goalsMap.put(goalsMap.size(),str);
+        public static void addGoal(GoalString str){
+            if(!goalsContains(str.getText())) goalsArr.add(str);
         }
 
-        public static void setGoalsMap(HashMap<Integer, AttributedString> map){
-            goalsMap = map;
+        private static boolean goalsContains(String text){
+            if(text == null) return false;
+            for(GoalString goal : goalsArr){
+                if(text.equals(goal.getText())) return true;
+            }
+            return false;
+        }
+        public static void setGoalsArr(ArrayList<GoalString> arr){
+            goalsArr = arr;
         }
 
-        public static HashMap<Integer, AttributedString> getGoals(){
-                return goalsMap;
+        public static ArrayList<GoalString> getGoals(){
+                return goalsArr;
             }
 }
 
