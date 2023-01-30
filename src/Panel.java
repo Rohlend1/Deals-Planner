@@ -3,6 +3,9 @@
 import strings.EventString;
 import strings.GoalString;
 import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.font.TextAttribute;
 import java.io.*;
 import java.text.AttributedString;
@@ -23,6 +26,7 @@ public class Panel extends JPanel implements Serializable {
     private static Component panel = anotherPanel();
     public static AttributedString atrsTime;
     public static AttributedString atrsDay;
+    public static JButton mainTempButton;
     static int id = 0; // Идентификатор текущего окна(0 - запись целей, 1 - запись событий на число)
 
     private static final Font font = new Font("Times New Roman", Font.BOLD, 20);
@@ -33,12 +37,31 @@ public class Panel extends JPanel implements Serializable {
         setBackground(Color.getHSBColor(22,33,45));
         JButton[] buttons = ButtonCreater.createButtons(WIDTH, HEIGHT);
         jTextField.setBounds(WIDTH / 2 - 50, HEIGHT / 2 - 150, 100, 25);
+
         for (JButton button : buttons) {
+            if(button.getText().equals("Подтвердить")) mainTempButton = button;
             add(button);
         }
+        KeyListener acceptKey = new KeyAdapter() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                super.keyTyped(e);
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    for (JButton button : buttons) {
+                        if(button.getText().equals("Подтвердить")){
+                            button.doClick();
+                        }
 
+                    }
+                }
+            }
+        };
+
+
+        addKeyListener(acceptKey);
         add(jTextField);
         ButtonCreater.setButtonVisible();
+
     }
 
     @Override
@@ -127,12 +150,13 @@ public class Panel extends JPanel implements Serializable {
         return new Panel();
     }
 
-    public static void main(String[] args) {
+    public static void createFrame() {
         f.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         f.setPreferredSize(new Dimension(WIDTH, HEIGHT));
         f.setResizable(false);
         f.getContentPane().add(panel);
-
+        f.getRootPane().setDefaultButton(mainTempButton);
+        UIManager.put("Button.defaultButtonFollowsFocus", Boolean.TRUE);
         f.pack();
         f.setVisible(true);
     }
