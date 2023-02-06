@@ -23,7 +23,6 @@ public class Panel extends JPanel implements Serializable {
     private static final int WIDTH = 1000;
     private static final int HEIGHT = 1000;
     static final Font plainFont = new Font("Times New Roman", Font.PLAIN, 20);
-    private static Component panel = anotherPanel();
     public static AttributedString atrsTime;
     public static AttributedString atrsDay;
     public static JButton mainTempButton;
@@ -141,9 +140,11 @@ public class Panel extends JPanel implements Serializable {
 
     static void reset() {
         f.getContentPane().removeAll();
-        panel = anotherPanel();
+        Component panel = anotherPanel();
         f.getContentPane().add(panel);
         f.revalidate();
+        f.getRootPane().setDefaultButton(mainTempButton);
+        UIManager.put("Button.defaultButtonFollowsFocus", Boolean.TRUE);
     }
 
     private static Panel anotherPanel() {
@@ -154,9 +155,7 @@ public class Panel extends JPanel implements Serializable {
         f.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         f.setPreferredSize(new Dimension(WIDTH, HEIGHT));
         f.setResizable(false);
-        f.getContentPane().add(panel);
-        f.getRootPane().setDefaultButton(mainTempButton);
-        UIManager.put("Button.defaultButtonFollowsFocus", Boolean.TRUE);
+        reset();
         f.pack();
         f.setVisible(true);
     }
